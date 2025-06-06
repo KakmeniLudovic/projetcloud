@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 articles = []
@@ -27,6 +27,13 @@ def update_article(index):
 def delete_article(index):
     articles.pop(index)
     return jsonify({'message': 'Article supprimé 🗑️'})
+
+@app.route('/page')
+def page_html():
+    try:
+        return render_template('page.html' , num_pages=12)
+    except Exception as e:
+        return f"Erreur: {str(e)}", 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5005)
