@@ -1,36 +1,32 @@
-from flask import Flask, render_template, request
+from flask import Flask, request, jsonify
 
-app = Flask(__name__, template_folder='./templates')
+app = Flask(__name__)
+articles = []
 
 @app.route('/')
 def home():
     return "Bienvenue dans mon application Flask ! 🚀"
 
-@app.route('/hello')
-def hello():
-    return 'Bonjour depuis Flask ! 👋'
-
-@app.route('/bonjour/<prenom>')
-def greet(prenom):
-    return f"Bonjour, {prenom.capitalize()} ! 😄"
-
 @app.route('/articles', methods=['GET'])
-def list_articles():
-    return {'articles': ['Article 1', 'Article 2', 'Article 3']}
+def get_articles():
+    return jsonify(articles)
 
 @app.route('/articles', methods=['POST'])
 def add_article():
     data = request.json
-    article = data.get('article')
-    # Ajouter l'article à une base de données
-    return {'message': f"Article '{article}' ajouté avec succès! ✅"}, 201
+    articles.append(data['article'])
+    return jsonify({'message': 'Article ajouté avec succès ! 🚀'}), 201
 
-@app.route('/page')
-def page_html():
-    try:
-        return render_template('page.html' , num_pages=12)
-    except Exception as e:
-        return f"Erreur: {str(e)}", 500
+@app.route('/articles/<int:index>', methods=['PUT'])
+def update_article(index):
+    data = request.get_json()
+    articles[index] = data['article']
+    return jsonify({'message': 'Article mis à jour 🔄'})
+
+@app.route('/articles/<int:index>', methods=['DELETE'])
+def delete_article(index):
+    articles.pop(index)
+    return jsonify({'message': 'Article supprimé 🗑️'})
 
 if __name__ == '__main__':
     app.run(debug=True, port=5005)
